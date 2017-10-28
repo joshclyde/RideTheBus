@@ -3,16 +3,32 @@ package com.joshwing.ridethebus
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.support.v4.content.ContextCompat.startActivity
+import android.content.Intent
+import android.widget.Button
 
-private val TAG = "MyActivity"
 
-class MainActivity : AppCompatActivity() {
+private val TAG = "MainActivity"
+
+class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val startGameButton = findViewById<Button>(R.id.startGameButton)
+        startGameButton.setOnClickListener(this)
 
         Log.v(TAG, "logging onCreate...")
+    }
+
+    override fun onClick(v: View) {
+        when (v.getId()) {
+            R.id.startGameButton -> {
+                val intent = Intent(this, GameSetup::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
     override fun onStart() {
