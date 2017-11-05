@@ -9,7 +9,11 @@ import android.widget.FrameLayout
 
 class GameSetup : FragmentActivity(),
         Over21Fragment.Over21DataPass,
-        NumberOfPlayersFragment.NumberOfPlayersDataPass {
+        NumberOfPlayersFragment.NumberOfPlayersDataPass,
+        NewPlayerFragment.NewPlayerDataPass {
+
+    var newPlayerIndex: Int = 0
+    var newPlayerCount: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +49,17 @@ class GameSetup : FragmentActivity(),
     }
 
     override fun numberOfPlayersData(numberOfPlayers: Int) {
+        newPlayerCount = numberOfPlayers
+        newPlayerIndex = 0
         nextFragment(NewPlayerFragment())
+    }
+
+    override fun newPlayerData(name: String, drink: String, picId: Int, maxDrinks: Int) {
+        newPlayerIndex++
+        if (newPlayerIndex < newPlayerCount) {
+            nextFragment(NewPlayerFragment())
+        } else {
+
+        }
     }
 }
