@@ -57,6 +57,8 @@ class GameSetup : FragmentActivity(),
     override fun over21Data(isOver21: Boolean) {
         if (isOver21) {
             nextFragment(NumberOfPlayersFragment())
+        } else {
+            nextFragment(Under21Fragment());
         }
     }
 

@@ -3,8 +3,9 @@ package com.joshwing.ridethebus;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -21,11 +22,24 @@ import database.RideTheBusDbHelper;
 public class GamePlayActivity extends FragmentActivity {
 
     GameLogic logic;
+    String[] samplePlayers = {"Wing Chung Chow", "Josh Clyde"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_play);
+     
+        if (findViewById(R.id.gamePlayFragmentContainer) != null) {
+            for (int i = 0; i < samplePlayers.length; i++) {
+                Stage1_1Fragment stage1 = new Stage1_1Fragment();
+                Bundle args = new Bundle();
+                args.putString("playerName", samplePlayers[i]);
+                stage1.setArguments(args);
+                getSupportFragmentManager().beginTransaction().
+                        add(R.id.gamePlayFragmentContainer, stage1).commit();
+            }
+        }
+      
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         long gameId = bundle.getLong("gameId");
@@ -167,6 +181,5 @@ public class GamePlayActivity extends FragmentActivity {
         cursor.close();
 
         return cards;
-
     }
 }
