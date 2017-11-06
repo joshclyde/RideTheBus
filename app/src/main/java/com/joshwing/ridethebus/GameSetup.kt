@@ -1,15 +1,22 @@
 package com.joshwing.ridethebus
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentTransaction
 import android.widget.FrameLayout
+import classes.PlayerDetails
 
 class GameSetup : FragmentActivity(),
         Over21Fragment.Over21DataPass,
-        NumberOfPlayersFragment.NumberOfPlayersDataPass {
+        NumberOfPlayersFragment.NumberOfPlayersDataPass,
+        NewPlayerFragment.NewPlayerDataPass {
+
+    var newPlayerIndex: Int = 0
+    var newPlayerCount: Int = 0
+    lateinit var playerDetails: Array<PlayerDetails>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +54,27 @@ class GameSetup : FragmentActivity(),
     }
 
     override fun numberOfPlayersData(numberOfPlayers: Int) {
+        newPlayerCount = numberOfPlayers
+        playerDetails = Array<PlayerDetails>(numberOfPlayers, {i -> PlayerDetails(i, "", "", 0, 0)})
+        newPlayerIndex = 0
         nextFragment(NewPlayerFragment())
+    }
+
+    override fun newPlayerData(name: String, drink: String, picId: Int, maxDrinks: Int) {
+        if (newPlayerIndex + 1 < newPlayerCount) {
+            playerDetails[newPlayerIndex].name = name
+            playerDetails[newPlayerIndex].drink = drink
+            playerDetails[newPlayerIndex].picId = picId
+            playerDetails[newPlayerIndex].maxDrinks = maxDrinks
+
+            newPlayerIndex++
+            nextFragment(NewPlayerFragment())
+        } else {
+            // create database
+
+
+            val intent = Intent(this, GamePlayActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
