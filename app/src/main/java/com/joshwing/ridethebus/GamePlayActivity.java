@@ -29,9 +29,9 @@ public class GamePlayActivity extends FragmentActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         long gameId = bundle.getLong("gameId");
-        //Log.d("gamesetup gameid", gameId.toString());
         this.loadDatabase(gameId);
-        Log.d("GamePlay activity", Boolean.toString(logic.isStart()));
+        // Log.d("GamePlay activity", Boolean.toString(logic.isStart()));
+
     }
 
     private void loadDatabase(Long gameId) {
