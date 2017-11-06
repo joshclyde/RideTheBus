@@ -54,7 +54,7 @@ class NewPlayerFragment : Fragment(), View.OnClickListener {
                 val playerNameVal = playerName.text.toString()
                 val drinkTypeVal = drinkType.selectedItem.toString()
                 val picIdVal = 1
-                val maxDrinksVal = maxDrinks.text.toString().toInt()
+                val maxDrinksVal = 20 // TODO: maxDrinks.text.toString().toInt()
                 dataPasser.newPlayerData(playerNameVal, drinkTypeVal, picIdVal, maxDrinksVal)
             }
         }
