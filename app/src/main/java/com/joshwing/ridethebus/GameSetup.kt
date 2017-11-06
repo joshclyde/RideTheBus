@@ -68,6 +68,9 @@ class GameSetup : FragmentActivity(),
             newPlayerIndex++
             nextFragment(NewPlayerFragment())
         } else {
+            // create database
+
+
             val intent = Intent(this, GamePlayActivity::class.java)
             startActivity(intent)
         }
