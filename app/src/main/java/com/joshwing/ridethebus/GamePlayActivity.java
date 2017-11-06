@@ -1,5 +1,6 @@
 package com.joshwing.ridethebus;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,7 +20,7 @@ import database.RideTheBusContract.PlayerDetailsTable;
 import database.RideTheBusContract.CardTable;
 import database.RideTheBusDbHelper;
 
-public class GamePlayActivity extends FragmentActivity {
+public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragment.stageOneListener{
 
     GameLogic logic;
     String[] samplePlayers = {"Wing Chung Chow", "Josh Clyde"};
@@ -30,14 +31,16 @@ public class GamePlayActivity extends FragmentActivity {
         setContentView(R.layout.activity_game_play);
      
         if (findViewById(R.id.gamePlayFragmentContainer) != null) {
-            for (int i = 0; i < samplePlayers.length; i++) {
-                Stage1_1Fragment stage1 = new Stage1_1Fragment();
-                Bundle args = new Bundle();
-                args.putString("playerName", samplePlayers[i]);
-                stage1.setArguments(args);
-                getSupportFragmentManager().beginTransaction().
-                        add(R.id.gamePlayFragmentContainer, stage1).commit();
-            }
+
+            Stage1_1Fragment stage1 = new Stage1_1Fragment();
+            Bundle args = new Bundle();
+            args.putString("playerName", samplePlayers[0]);
+            args.putInt("index", 0);
+            stage1.setArguments(args);
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(R.id.gamePlayFragmentContainer, stage1, samplePlayers[0]);
+            ft.commit();
+
         }
       
         Intent intent = getIntent();
@@ -181,5 +184,27 @@ public class GamePlayActivity extends FragmentActivity {
         cursor.close();
 
         return cards;
+    }
+
+
+    //Implement next Player method, simply replace the old one IF there is a next player
+    //o.w. move on to stage 2
+    @Override
+    public void nextPlayer(android.support.v4.app.Fragment fragment, int index){
+        index++;
+        if(index < samplePlayers.length) {
+            Stage1_1Fragment stage1 = new Stage1_1Fragment();
+            Bundle args = new Bundle();
+            args.putString("playerName", samplePlayers[index]);
+            args.putInt("index", index);
+            stage1.setArguments(args);
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.gamePlayFragmentContainer, stage1, samplePlayers[index]);
+            ft.commit();
+        } else{
+
+        }
+
+
     }
 }

@@ -3,13 +3,11 @@ package com.joshwing.ridethebus;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -36,6 +34,7 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         TextView playerNameView = v.findViewById(R.id.playerName);
         playerNameView.setText(playerName);
 
+        //Hides all buttons execept Red or Black
         redOrBlack = v.findViewById(R.id.redOrBlack);
         higherOrLower = v.findViewById(R.id.higherOrLower);
         higherOrLower.setVisibility(View.GONE);
@@ -44,6 +43,7 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         suit = v.findViewById(R.id.suit);
         suit.setVisibility(View.GONE);
 
+        //Set listeners
         Button red = (Button) v.findViewById(R.id.Red);
         red.setOnClickListener(this);
         Button black = (Button) v.findViewById(R.id.Black);
@@ -69,7 +69,8 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         return v;
     }
 
-
+    //Listeners for all the buttons
+    //Missing: check to see if their answer was correct
     public void onClick(View v) {
         switch (v.getId()) {
             case  R.id.Red: {
@@ -109,22 +110,42 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
             }
 
             case  R.id.Diamonds: {
-                getActivity().finish();
+                try{
+                    ((stageOneListener) getActivity()).
+                            nextPlayer(this, this.getArguments().getInt("index"));
+                }catch (ClassCastException cce){
+
+                }
                 break;
             }
 
             case R.id.Hearts: {
-                getActivity().finish();
+                try{
+                    ((stageOneListener) getActivity()).
+                            nextPlayer(this, this.getArguments().getInt("index"));
+                }catch (ClassCastException cce){
+
+                }
                 break;
             }
 
             case  R.id.Clubs: {
-                getActivity().finish();
+                try{
+                    ((stageOneListener) getActivity()).
+                            nextPlayer(this, this.getArguments().getInt("index"));
+                }catch (ClassCastException cce){
+
+                }
                 break;
             }
 
             case R.id.Spades: {
-                getActivity().finish();
+                try{
+                    ((stageOneListener) getActivity()).
+                            nextPlayer(this, this.getArguments().getInt("index"));
+                }catch (ClassCastException cce){
+
+                }
                 break;
             }
 
@@ -132,6 +153,10 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    //Interface method for next player; implemented in activity
+    public interface stageOneListener{
+        public void nextPlayer(Fragment fragment, int i);
+    }
 
 
 }
