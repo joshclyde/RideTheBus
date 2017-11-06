@@ -8,6 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import classes.Card;
+import classes.Game;
+import classes.GameLogic;
+import classes.PlayerState;
 import database.RideTheBusContract.GameTable;
 import database.RideTheBusContract.PlayerStateTable;
 import database.RideTheBusContract.PlayerDetailsTable;
@@ -16,7 +20,7 @@ import database.RideTheBusDbHelper;
 
 public class GamePlayActivity extends FragmentActivity {
 
-
+    GameLogic logic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,15 +31,21 @@ public class GamePlayActivity extends FragmentActivity {
         long gameId = bundle.getLong("gameId");
         //Log.d("gamesetup gameid", gameId.toString());
         this.loadDatabase(gameId);
+        Log.d("GamePlay activity", Boolean.toString(logic.isStart()));
     }
 
     private void loadDatabase(Long gameId) {
         RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Game game = getGame(db, gameId);
+        PlayerState[] playerStates = getPlayerStates(db, gameId);
+        Card[] cards = getCards(db, gameId);
+        logic = new GameLogic(game, playerStates, cards);
+    }
 
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
-        String[] gameProjection = {
+    private Game getGame(SQLiteDatabase db, Long gameId) {
+        // columns getting
+        String[] projection = {
                 GameTable._ID,
                 GameTable.COLUMN_CARD_ID,
                 GameTable.COLUMN_PLAYER_ID
@@ -49,9 +59,9 @@ public class GamePlayActivity extends FragmentActivity {
         String sortOrder =
                 GameTable._ID + " DESC";
 
-        Cursor gameCursor = db.query(
+        Cursor cursor = db.query(
                 GameTable.TABLE_NAME,                     // The table to query
-                gameProjection,                           // The columns to return
+                projection,                           // The columns to return
                 selection,                                // The columns for the WHERE clause
                 selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows
@@ -59,8 +69,104 @@ public class GamePlayActivity extends FragmentActivity {
                 sortOrder                                 // The sort turn
         );
 
-        gameCursor.moveToNext();
-        Log.d("GamePlayActivity", Long.toString(gameCursor.getLong(gameCursor.getColumnIndexOrThrow(GameTable._ID))));
-        gameCursor.close();
+        cursor.moveToNext();
+        long gamePlayerId = cursor.getLong(cursor.getColumnIndexOrThrow(GameTable.COLUMN_PLAYER_ID));
+        long gameCardId = cursor.getLong(cursor.getColumnIndexOrThrow(GameTable.COLUMN_CARD_ID));
+        Game game = new Game(gameId, gamePlayerId, gameCardId);
+        cursor.close();
+
+        return game;
+    }
+
+    private PlayerState[] getPlayerStates(SQLiteDatabase db, Long gameId) {
+        // columns getting
+        String[] projection = {
+                PlayerStateTable._ID,
+                PlayerStateTable.COLUMN_GAME_ID,
+                PlayerStateTable.COLUMN_PLAYER_ID,
+                PlayerStateTable.COLUMN_TURN,
+                PlayerStateTable.COLUMN_MAX_DRINKS,
+                PlayerStateTable.COLUMN_DRINKS_TAKEN
+        };
+
+        // Filter results WHERE "title" = 'My Title'
+        String selection = PlayerStateTable.COLUMN_GAME_ID + " = ?";
+        String[] selectionArgs = { Long.toString(gameId) };
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                PlayerStateTable.COLUMN_TURN + " ASC";
+
+        Cursor cursor = db.query(
+                PlayerStateTable.TABLE_NAME,                     // The table to query
+                projection,                           // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort turn
+        );
+
+        PlayerState[] playerStates = new PlayerState[cursor.getCount()];
+        int counter = 0;
+        while (cursor.moveToNext()) {
+            long playerId = cursor.getLong(cursor.getColumnIndexOrThrow(PlayerStateTable._ID));
+            long playerGameId = cursor.getLong(cursor.getColumnIndexOrThrow(PlayerStateTable.COLUMN_GAME_ID));
+            long playerPlayerId = cursor.getLong(cursor.getColumnIndexOrThrow(PlayerStateTable.COLUMN_PLAYER_ID));
+            int playerTurn= cursor.getInt(cursor.getColumnIndexOrThrow(PlayerStateTable.COLUMN_TURN));
+            int playerDrinksTaken = cursor.getInt(cursor.getColumnIndexOrThrow(PlayerStateTable.COLUMN_DRINKS_TAKEN));
+            int playerMaxDrinks = cursor.getInt(cursor.getColumnIndexOrThrow(PlayerStateTable.COLUMN_MAX_DRINKS));
+            playerStates[counter] = new PlayerState(playerId, playerGameId, playerPlayerId, playerTurn, playerDrinksTaken, playerMaxDrinks);
+        }
+        cursor.close();
+
+        return playerStates;
+    }
+
+    private Card[] getCards(SQLiteDatabase db, Long gameId) {
+        // columns getting
+        String[] projection = {
+                CardTable._ID,
+                CardTable.COLUMN_GAME_ID,
+                CardTable.COLUMN_PLAYER_ID,
+                CardTable.COLUMN_VALUE,
+                CardTable.COLUMN_PLAYER_ORDER,
+                CardTable.COLUMN_DIAMOND_ORDER
+        };
+
+        // Filter results WHERE "title" = 'My Title'
+        String selection = CardTable.COLUMN_GAME_ID + " = ?";
+        String[] selectionArgs = { Long.toString(gameId) };
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                CardTable.COLUMN_VALUE + " ASC";
+
+        Cursor cursor = db.query(
+                CardTable.TABLE_NAME,                     // The table to query
+                projection,                           // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort turn
+        );
+
+        Card[] cards = new Card[cursor.getCount()]; // should be 52 cards
+
+        int counter = 0;
+        while (cursor.moveToNext()) {
+            long cardId = cursor.getLong(cursor.getColumnIndexOrThrow(CardTable._ID));
+            long playerId = cursor.getLong(cursor.getColumnIndexOrThrow(CardTable.COLUMN_PLAYER_ID));
+            int diamondOrder = cursor.getInt(cursor.getColumnIndexOrThrow(CardTable.COLUMN_DIAMOND_ORDER));
+            int playerOrder = cursor.getInt(cursor.getColumnIndexOrThrow(CardTable.COLUMN_PLAYER_ORDER));
+            int value = cursor.getInt(cursor.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
+
+            cards[counter] = new Card(cardId, gameId, diamondOrder, playerId, playerOrder, value);
+        }
+        cursor.close();
+
+        return cards;
+
     }
 }

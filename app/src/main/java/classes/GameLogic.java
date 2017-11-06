@@ -5,13 +5,11 @@ import java.util.Random;
 public class GameLogic {
 
     private Game game;
-    private PlayerDetails[] playerDetails;
     private PlayerState[] playerStates;
     private Card[] cards;
 
-    public GameLogic(Game game, PlayerDetails[] playerDetails, PlayerState[] playerStates, Card[] cards) {
+    public GameLogic(Game game, PlayerState[] playerStates, Card[] cards) {
         this.game = game;
-        this.playerDetails = playerDetails;
         this.playerStates = playerStates;
         this.cards = cards;
     }

@@ -111,8 +111,8 @@ class GameSetup : FragmentActivity(),
                 cardValues.put(CardTable.COLUMN_VALUE, i)
                 cardValues.put(CardTable.COLUMN_GAME_ID, newGameId)
                 cardValues.putNull(CardTable.COLUMN_PLAYER_ID)
-                cardValues.putNull(CardTable.COLUMN_DIAMOND_ORDER)
-                cardValues.putNull(CardTable.COLUMN_PLAYER_ORDER)
+                cardValues.put(CardTable.COLUMN_DIAMOND_ORDER, -1)
+                cardValues.put(CardTable.COLUMN_PLAYER_ORDER, -1)
                 db.insert(CardTable.TABLE_NAME, null, cardValues)
             }
 
