@@ -24,7 +24,7 @@ class NumberOfPlayersFragment : Fragment(), View.OnClickListener {
         val v = inflater!!.inflate(R.layout.fragment_number_of_players, container, false)
         if (v != null) {
             numberPicker = v.findViewById<NumberPicker>(R.id.numberOfPlayersNumberPicker)
-            numberPicker.minValue = 4
+            numberPicker.minValue = 2
             numberPicker.maxValue = 8
             numberPicker.value = 6
 
