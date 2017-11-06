@@ -56,7 +56,7 @@ public class GamePlayActivity extends FragmentActivity {
                 selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
+                sortOrder                                 // The sort turn
         );
 
         gameCursor.moveToNext();
