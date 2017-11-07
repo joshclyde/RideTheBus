@@ -213,15 +213,17 @@ public class GamePlayActivity extends FragmentActivity
     //o.w. move on to stage 2
     @Override
     public void nextPlayer(){
+        RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
         index++;
-        if (index < 2) {
+        if (index < DatabaseFunctions.getNumberOfPlayers(dbHelper, gameId)) {
             Stage1_1Fragment stage1 = new Stage1_1Fragment();
             Bundle args = new Bundle();
 //            args.putString("playerName", samplePlayers[index]);
             args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
             args.putInt("index", index);
             stage1.setArguments(args);
-            ft.replace(R.id.gamePlayFragmentContainer, stage1, samplePlayers[index]);
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.gamePlayFragmentContainer, stage1);
             ft.commit();
         } else{
             Stage2_1Fragment stage2 = new Stage2_1Fragment();
@@ -229,6 +231,7 @@ public class GamePlayActivity extends FragmentActivity
             //Switch between 4 or 5
             args.putInt("maxNumRows", 4);
             stage2.setArguments(args);
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.gamePlayFragmentContainer, stage2);
             ft.commit();
         }

@@ -110,6 +110,9 @@ public class DatabaseFunctions {
 
     public static void createDiamond(RideTheBusDbHelper dbHelper, long gameId) {}
 
+    public static int getNumberOfPlayers(RideTheBusDbHelper dbHelper, long gameId) {
+        return getPlayerState(dbHelper, gameId).getCount();
+    }
 
     public static int getCurrentCard(RideTheBusDbHelper dbHelper, long gameId) {
         Cursor game = getGameWhereId(dbHelper, gameId);
