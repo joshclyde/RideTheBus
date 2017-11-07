@@ -26,6 +26,7 @@ public class GamePlayActivity extends FragmentActivity
 
 //    GameLogic logic;
     String[] samplePlayers = {"Wing Chung Chow", "Josh Clyde"};
+    int numOfPlayers = samplePlayers.length;
     long gameId;
     int index;
 
@@ -229,7 +230,7 @@ public class GamePlayActivity extends FragmentActivity
             Stage2_1Fragment stage2 = new Stage2_1Fragment();
             Bundle args = new Bundle();
             //Switch between 4 or 5
-            args.putInt("maxNumRows", 4);
+            args.putInt("maxNumRows", 5);
             stage2.setArguments(args);
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.gamePlayFragmentContainer, stage2);
