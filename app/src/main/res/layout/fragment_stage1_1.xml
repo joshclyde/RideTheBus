@@ -158,10 +158,10 @@
                 android:layout_alignParentBottom="true">
 
                 <ImageView
-
+                    android:id="@+id/stage1Card0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/clubs_jack"
+                    android:src="@drawable/back"
                     android:layout_centerInParent="true"
                     />
 
@@ -186,24 +186,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <ImageView
-
+                android:id="@+id/stage1Card1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/clubs_4"
+                android:src="@drawable/back"
                 android:layout_centerInParent="true"
                 />
             <ImageView
-
+                android:id="@+id/stage1Card2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/clubs_3"
+                android:src="@drawable/back"
                 android:layout_centerInParent="true"
                 />
             <ImageView
-
+                android:id="@+id/stage1Card3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/clubs_8"
+                android:src="@drawable/back"
+                android:layout_centerInParent="true"
+                />
+            <ImageView
+                android:id="@+id/stage1Card4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/back"
                 android:layout_centerInParent="true"
                 />
         </LinearLayout>

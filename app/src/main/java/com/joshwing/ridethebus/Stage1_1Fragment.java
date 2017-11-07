@@ -1,14 +1,22 @@
 package com.joshwing.ridethebus;
 
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import classes.CardFunctions;
+import classes.DatabaseFunctions;
+import database.RideTheBusDbHelper;
 
 
 /**
@@ -16,14 +24,14 @@ import android.widget.TextView;
  */
 public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
 
+    stageOneListener dataPasser;
 
     public Stage1_1Fragment() {
         // Required empty public constructor
     }
 
     LinearLayout redOrBlack, higherOrLower, betweenOutside, suit;
-
-
+    ImageView card1, card2, card3, card4, card0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -33,6 +41,14 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         String playerName = this.getArguments().getString("playerName");
         TextView playerNameView = v.findViewById(R.id.playerName);
         playerNameView.setText(playerName);
+
+        // gets all cards
+        card1 = v.findViewById(R.id.stage1Card1);
+        card1.setVisibility(View.INVISIBLE);
+        card2 = v.findViewById(R.id.stage1Card2);
+        card3 = v.findViewById(R.id.stage1Card3);
+        card4 = v.findViewById(R.id.stage1Card4);
+        card0 = v.findViewById(R.id.stage1Card0);
 
         //Hides all buttons execept Red or Black
         redOrBlack = v.findViewById(R.id.redOrBlack);
@@ -69,60 +85,96 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         return v;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Log.d("Here 1", "hi");
+        dataPasser = (stageOneListener) context;
+        Log.d("Here 2", "hi");
+    }
+
+    private void drawCard(ImageView cardView, int image) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cardView.setImageDrawable(getResources().getDrawable(image, this.getContext().getTheme()));
+        } else {
+            cardView.setImageDrawable(getResources().getDrawable(image));
+        }
+    }
+
     //Listeners for all the buttons
     //Missing: check to see if their answer was correct
     public void onClick(View v) {
         switch (v.getId()) {
             case  R.id.Red: {
                 redOrBlack.setVisibility(View.GONE);
+                card1.setVisibility(View.VISIBLE);
+                int card = dataPasser.doNextCard(0);
+                drawCard(card1, CardFunctions.getImage(card));
+                card2.setVisibility(View.INVISIBLE);
                 higherOrLower.setVisibility(View.VISIBLE);
                 break;
             }
 
             case R.id.Black: {
                 redOrBlack.setVisibility(View.GONE);
+                card1.setVisibility(View.VISIBLE);
+                int card = dataPasser.doNextCard(1);
+                drawCard(card1, CardFunctions.getImage(card));
+                card2.setVisibility(View.INVISIBLE);
                 higherOrLower.setVisibility(View.VISIBLE);
                 break;
             }
 
             case  R.id.Higher: {
                 higherOrLower.setVisibility(View.GONE);
+                card2.setVisibility(View.VISIBLE);
+                int card = dataPasser.doNextCard(0);
+                drawCard(card2, CardFunctions.getImage(card));
+                card3.setVisibility(View.INVISIBLE);
                 betweenOutside.setVisibility(View.VISIBLE);
                 break;
             }
 
             case R.id.Lower: {
                 higherOrLower.setVisibility(View.GONE);
+                card2.setVisibility(View.VISIBLE);
+                int card = dataPasser.doNextCard(1);
+                drawCard(card2, CardFunctions.getImage(card));
+                card3.setVisibility(View.INVISIBLE);
                 betweenOutside.setVisibility(View.VISIBLE);
                 break;
             }
 
             case  R.id.Between: {
                 betweenOutside.setVisibility(View.GONE);
+                card3.setVisibility(View.VISIBLE);
+                int card = dataPasser.doNextCard(0);
+                drawCard(card3, CardFunctions.getImage(card));
+                card4.setVisibility(View.INVISIBLE);
                 suit.setVisibility(View.VISIBLE);
                 break;
             }
 
             case R.id.Outside: {
                 betweenOutside.setVisibility(View.GONE);
+                card3.setVisibility(View.VISIBLE);
+                int card = dataPasser.doNextCard(1);
+                drawCard(card3, CardFunctions.getImage(card));
+                card4.setVisibility(View.INVISIBLE);
                 suit.setVisibility(View.VISIBLE);
                 break;
             }
 
             case  R.id.Diamonds: {
-                try{
-                    ((stageOneListener) getActivity()).
-                            nextPlayer(this, this.getArguments().getInt("index"));
-                }catch (ClassCastException cce){
-
-                }
+                int card = dataPasser.doNextCard(0);
+                dataPasser.nextPlayer();
                 break;
             }
 
             case R.id.Hearts: {
                 try{
-                    ((stageOneListener) getActivity()).
-                            nextPlayer(this, this.getArguments().getInt("index"));
+                    int card = dataPasser.doNextCard(1);
+                    dataPasser.nextPlayer();
                 }catch (ClassCastException cce){
 
                 }
@@ -131,8 +183,8 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
 
             case  R.id.Clubs: {
                 try{
-                    ((stageOneListener) getActivity()).
-                            nextPlayer(this, this.getArguments().getInt("index"));
+                    int card = dataPasser.doNextCard(2);
+                    dataPasser.nextPlayer();
                 }catch (ClassCastException cce){
 
                 }
@@ -141,8 +193,8 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
 
             case R.id.Spades: {
                 try{
-                    ((stageOneListener) getActivity()).
-                            nextPlayer(this, this.getArguments().getInt("index"));
+                    int card = dataPasser.doNextCard(3);
+                    dataPasser.nextPlayer();
                 }catch (ClassCastException cce){
 
                 }
@@ -155,8 +207,8 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
 
     //Interface method for next player; implemented in activity
     public interface stageOneListener{
-        public void nextPlayer(Fragment fragment, int i);
+        public void nextPlayer();
+        public int doNextCard(int choice);
     }
-
 
 }
