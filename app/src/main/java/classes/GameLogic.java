@@ -59,4 +59,45 @@ public class GameLogic {
         }
         return -1;
     }
+
+    public int getPlayerIndexId(long id) {
+        for (int i = 0; i < playerStates.length; i++) {
+            if (playerStates[i].getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+    // returns the index of the current player's turn
+//    public int getWhichPlayer() {
+////        for (int i = 1; i < playerStates.length; i++) {
+////            if (getPlayerNumOfCards(i - 1) > getPlayerNumOfCards(i)) {
+////                return i;
+////            }
+////        }
+////        return 0;
+//        return getPlayerIndexTurn(game.getPlayerId());
+//    }
+
+    public boolean makeChoice(int choice) {
+        // check if player needs to drink
+        // getting all cards in Cards where playerId = currPlayerId
+        long playerId = game.getPlayerId();
+        return true;
+        // calculating which order we are on
+        // set the next card/player
+        // return true or false
+    }
+
+    public Game getGame() {
+        return game;
+    }
+    public PlayerState[] getPlayerStates() {
+        return playerStates;
+    }
+    public Card[] getCards() {
+        return cards;
+    }
 }

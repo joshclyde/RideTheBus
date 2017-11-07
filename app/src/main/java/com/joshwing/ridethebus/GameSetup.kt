@@ -70,12 +70,12 @@ class GameSetup : FragmentActivity(),
     }
 
     override fun newPlayerData(name: String, drink: String, picId: Int, maxDrinks: Int) {
-        if (newPlayerIndex + 1 < newPlayerCount) {
-            playerDetails[newPlayerIndex].name = name
-            playerDetails[newPlayerIndex].drink = drink
-            playerDetails[newPlayerIndex].picId = picId
-            playerDetails[newPlayerIndex].maxDrinks = maxDrinks
+        playerDetails[newPlayerIndex].name = name
+        playerDetails[newPlayerIndex].drink = drink
+        playerDetails[newPlayerIndex].picId = picId
+        playerDetails[newPlayerIndex].maxDrinks = maxDrinks
 
+        if (newPlayerIndex + 1 < newPlayerCount) {
             newPlayerIndex++
             nextFragment(NewPlayerFragment())
         } else {
@@ -119,7 +119,6 @@ class GameSetup : FragmentActivity(),
             }
 
             val intent = Intent(this, GamePlayActivity::class.java)
-            Log.d("gamesetup gameid", newGameId.toString())
             intent.putExtra("gameId", newGameId)
             startActivity(intent)
         }
