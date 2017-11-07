@@ -191,6 +191,7 @@ public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragm
     //o.w. move on to stage 2
     @Override
     public void nextPlayer(android.support.v4.app.Fragment fragment, int index){
+        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         index++;
         if(index < samplePlayers.length) {
             Stage1_1Fragment stage1 = new Stage1_1Fragment();
@@ -198,11 +199,16 @@ public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragm
             args.putString("playerName", samplePlayers[index]);
             args.putInt("index", index);
             stage1.setArguments(args);
-            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.gamePlayFragmentContainer, stage1, samplePlayers[index]);
             ft.commit();
         } else{
-
+            Stage2_1Fragment stage2 = new Stage2_1Fragment();
+            Bundle args = new Bundle();
+            //Switch between 4 or 5
+            args.putInt("maxNumRows", 4);
+            stage2.setArguments(args);
+            ft.replace(R.id.gamePlayFragmentContainer, stage2);
+            ft.commit();
         }
 
 
