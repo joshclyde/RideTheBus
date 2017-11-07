@@ -24,6 +24,7 @@ public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragm
 
     GameLogic logic;
     String[] samplePlayers = {"Wing Chung Chow", "Josh Clyde"};
+    int numOfPlayers = samplePlayers.length;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,7 +206,7 @@ public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragm
             Stage2_1Fragment stage2 = new Stage2_1Fragment();
             Bundle args = new Bundle();
             //Switch between 4 or 5
-            args.putInt("maxNumRows", 4);
+            args.putInt("maxNumRows", 5);
             stage2.setArguments(args);
             ft.replace(R.id.gamePlayFragmentContainer, stage2);
             ft.commit();
