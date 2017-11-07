@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import classes.Card;
+import classes.DatabaseFunctions;
 import classes.Game;
 import classes.GameLogic;
 import classes.PlayerState;
@@ -20,45 +21,59 @@ import database.RideTheBusContract.PlayerDetailsTable;
 import database.RideTheBusContract.CardTable;
 import database.RideTheBusDbHelper;
 
-public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragment.stageOneListener{
+public class GamePlayActivity extends FragmentActivity
+        implements  Stage1_1Fragment.stageOneListener {
 
-    GameLogic logic;
+//    GameLogic logic;
     String[] samplePlayers = {"Wing Chung Chow", "Josh Clyde"};
     int numOfPlayers = samplePlayers.length;
+    long gameId;
+    int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_play);
-     
+
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        gameId = bundle.getLong("gameId");
+        // logic = this.loadDatabase(gameId);
+
+
         if (findViewById(R.id.gamePlayFragmentContainer) != null) {
+
+//            if (logic.isStart()) {
+//                logic.startGame();
+//            }
+//
+//            if (logic.isStage1()) {
+//            }
 
             Stage1_1Fragment stage1 = new Stage1_1Fragment();
             Bundle args = new Bundle();
-            args.putString("playerName", samplePlayers[0]);
+//            args.putString("playerName", samplePlayers[0]);
+            RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
+            DatabaseFunctions.nextCard(dbHelper, gameId);
+            args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
             args.putInt("index", 0);
+
             stage1.setArguments(args);
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.add(R.id.gamePlayFragmentContainer, stage1, samplePlayers[0]);
+            ft.add(R.id.gamePlayFragmentContainer, stage1, samplePlayers[0]);
             ft.commit();
 
         }
-      
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-        long gameId = bundle.getLong("gameId");
-        this.loadDatabase(gameId);
-        // Log.d("GamePlay activity", Boolean.toString(logic.isStart()));
 
     }
 
-    private void loadDatabase(Long gameId) {
+    private GameLogic loadDatabase(Long gameId) {
         RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Game game = getGame(db, gameId);
         PlayerState[] playerStates = getPlayerStates(db, gameId);
         Card[] cards = getCards(db, gameId);
-        logic = new GameLogic(game, playerStates, cards);
+        return new GameLogic(game, playerStates, cards);
     }
 
     private Game getGame(SQLiteDatabase db, Long gameId) {
@@ -187,20 +202,29 @@ public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragm
         return cards;
     }
 
+//    private void nextFragment(Fragment fragment) {
+//        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.gamePlayFragmentContainer, fragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
+//    }
+
 
     //Implement next Player method, simply replace the old one IF there is a next player
     //o.w. move on to stage 2
     @Override
-    public void nextPlayer(android.support.v4.app.Fragment fragment, int index){
-        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    public void nextPlayer(){
+        RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
         index++;
-        if(index < samplePlayers.length) {
+        if (index < DatabaseFunctions.getNumberOfPlayers(dbHelper, gameId)) {
             Stage1_1Fragment stage1 = new Stage1_1Fragment();
             Bundle args = new Bundle();
-            args.putString("playerName", samplePlayers[index]);
+//            args.putString("playerName", samplePlayers[index]);
+            args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
             args.putInt("index", index);
             stage1.setArguments(args);
-            ft.replace(R.id.gamePlayFragmentContainer, stage1, samplePlayers[index]);
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.gamePlayFragmentContainer, stage1);
             ft.commit();
         } else{
             Stage2_1Fragment stage2 = new Stage2_1Fragment();
@@ -208,10 +232,24 @@ public class GamePlayActivity extends FragmentActivity implements  Stage1_1Fragm
             //Switch between 4 or 5
             args.putInt("maxNumRows", 5);
             stage2.setArguments(args);
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.gamePlayFragmentContainer, stage2);
             ft.commit();
         }
-
-
     }
+    boolean takeDrink = false;
+    @Override
+    public int doNextCard(int choice) {
+        RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
+        int card = DatabaseFunctions.getCurrentCard(dbHelper, gameId);
+        takeDrink = DatabaseFunctions.isTakeDrink(dbHelper, gameId, choice);
+        DatabaseFunctions.nextCard(dbHelper, gameId);
+
+        return card;
+    };
+    @Override
+    public boolean shouldTakeDrink() {
+        return takeDrink;
+    }
+
 }
