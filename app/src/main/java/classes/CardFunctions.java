@@ -12,7 +12,7 @@ public class CardFunctions {
         return card % 13;
     }
     public static int getCardSuit(int card) {
-        return card / 4;
+        return card / 13;
     }
     public static boolean isRed(int card) {
         return isDiamond(card) || isHeart(card);
@@ -24,13 +24,13 @@ public class CardFunctions {
         return getCardSuit(card) == 0;
     }
     public static boolean isHeart(int card) {
-        return getCardSuit(card)/ 4 == 1;
+        return getCardSuit(card) == 1;
     }
     public static boolean isClub(int card) {
-        return getCardSuit(card)/ 4 == 2;
+        return getCardSuit(card) == 2;
     }
     public static boolean isSpade(int card) {
-        return getCardSuit(card)/ 4 == 3;
+        return getCardSuit(card) == 3;
     }
     public static boolean isHigher(int card1, int card2) {
         return getCardNumber(card1) < getCardNumber(card2);

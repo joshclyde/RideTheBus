@@ -174,7 +174,7 @@ public class DatabaseFunctions {
         String[] selectionArgs = { Long.toString(gameId), Long.toString(playerId) };
         // SORT
         String sortOrder =
-                CardTable.COLUMN_PLAYER_ORDER + " DESC";
+                CardTable.COLUMN_PLAYER_ORDER + " ASC";
         // QUERY
         Cursor cursor = db.query(
                 tableName,                                // The table to query
