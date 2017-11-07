@@ -75,6 +75,7 @@
                     android:layout_height="wrap_content"
                     android:text="Black"
                     android:layout_marginLeft="30sp"/>
+
             </LinearLayout>
 
             <LinearLayout

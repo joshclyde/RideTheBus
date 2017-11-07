@@ -229,13 +229,19 @@ public class GamePlayActivity extends FragmentActivity
 
         }
     }
+    boolean takeDrink = false;
     @Override
     public int doNextCard(int choice) {
         RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
         int card = DatabaseFunctions.getCurrentCard(dbHelper, gameId);
-        boolean takeDrink = DatabaseFunctions.isTakeDrink(dbHelper, gameId, choice);
+        takeDrink = DatabaseFunctions.isTakeDrink(dbHelper, gameId, choice);
         DatabaseFunctions.nextCard(dbHelper, gameId);
 
         return card;
     };
+    @Override
+    public boolean shouldTakeDrink() {
+        return takeDrink;
+    }
+
 }

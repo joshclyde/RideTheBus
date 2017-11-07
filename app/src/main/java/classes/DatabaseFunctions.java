@@ -31,14 +31,14 @@ public class DatabaseFunctions {
             // red black
             cards.moveToNext();
             int cardValue = cards.getInt(cards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
-            takeDrink = choice == 0 ? CardFunctions.isRed(cardValue) : CardFunctions.isBlack(cardValue);
+            takeDrink = choice == 0 ? !CardFunctions.isRed(cardValue) : !CardFunctions.isBlack(cardValue);
         } else if (cards.getCount() == 2) {
             // higher lower
             cards.moveToNext();
             int cardValue1 = cards.getInt(cards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
             cards.moveToNext();
             int cardValue2 = cards.getInt(cards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
-            takeDrink = choice == 0 ? CardFunctions.isHigher(cardValue1, cardValue2) : CardFunctions.isLower(cardValue1, cardValue2);
+            takeDrink = choice == 0 ? !CardFunctions.isHigher(cardValue1, cardValue2) : !CardFunctions.isLower(cardValue1, cardValue2);
         } else if (cards.getCount() == 3) {
             // in between outside
             cards.moveToNext();
@@ -47,7 +47,7 @@ public class DatabaseFunctions {
             int cardValue2 = cards.getInt(cards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
             cards.moveToNext();
             int cardValue3 = cards.getInt(cards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
-            takeDrink = choice == 0 ? CardFunctions.isBetween(cardValue1, cardValue2, cardValue3) : CardFunctions.isOutside(cardValue1, cardValue2, cardValue3);
+            takeDrink = choice == 0 ? !CardFunctions.isBetween(cardValue1, cardValue2, cardValue3) : !CardFunctions.isOutside(cardValue1, cardValue2, cardValue3);
         } else if (cards.getCount() == 4){
             // suit
             cards.moveToNext();
@@ -57,16 +57,16 @@ public class DatabaseFunctions {
             int cardValue = cards.getInt(cards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
             switch (choice) {
                 case 0:
-                    takeDrink = CardFunctions.isDiamond(cardValue);
+                    takeDrink = !CardFunctions.isDiamond(cardValue);
                     break;
                 case 1:
-                    takeDrink = CardFunctions.isHeart(cardValue);
+                    takeDrink = !CardFunctions.isHeart(cardValue);
                     break;
                 case 2:
-                    takeDrink = CardFunctions.isClub(cardValue);
+                    takeDrink = !CardFunctions.isClub(cardValue);
                     break;
                 case 3:
-                    takeDrink = CardFunctions.isSpade(cardValue);
+                    takeDrink = !CardFunctions.isSpade(cardValue);
                     break;
             }
         }
