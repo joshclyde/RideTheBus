@@ -120,7 +120,8 @@ class GameSetup : FragmentActivity(),
 
             val intent = Intent(this, GamePlayActivity::class.java)
             intent.putExtra("gameId", newGameId)
-            startActivity(intent)
+            startActivity(intent);
+            finish();
         }
     }
 }
