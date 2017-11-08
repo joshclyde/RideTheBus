@@ -7,10 +7,11 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.provider.MediaStore
+import android.content.Intent
+import android.graphics.Bitmap
+import android.app.Activity.RESULT_OK
+import android.widget.*
 
 
 class NewPlayerFragment : Fragment(), View.OnClickListener {
@@ -19,6 +20,10 @@ class NewPlayerFragment : Fragment(), View.OnClickListener {
     lateinit var playerName: EditText
     lateinit var maxDrinks: EditText
     lateinit var drinkType: Spinner
+    lateinit var mImageView: ImageView
+
+    val REQUEST_IMAGE_CAPTURE = 1
+
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -39,6 +44,9 @@ class NewPlayerFragment : Fragment(), View.OnClickListener {
 
             val completeButton = v.findViewById<Button>(R.id.newPlayerCompleteButton)
             completeButton.setOnClickListener(this)
+            val takePictureButton = v.findViewById<Button>(R.id.takePicture)
+            takePictureButton.setOnClickListener(this)
+            mImageView = v.findViewById(R.id.playerPicture)
         }
         return v
     }
@@ -57,6 +65,26 @@ class NewPlayerFragment : Fragment(), View.OnClickListener {
                 val maxDrinksVal = 20 // TODO: maxDrinks.text.toString().toInt()
                 dataPasser.newPlayerData(playerNameVal, drinkTypeVal, picIdVal, maxDrinksVal)
             }
+
+            R.id.takePicture -> {
+                dispatchTakePictureIntent()
+            }
+
+        }
+    }
+
+    private fun dispatchTakePictureIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            val extras = data!!.extras
+            val imageBitmap = extras!!.get("data") as Bitmap
+            mImageView.setImageBitmap(imageBitmap)
         }
     }
 

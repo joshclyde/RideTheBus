@@ -6,6 +6,7 @@
     tools:context="com.joshwing.ridethebus.Stage2_1Fragment">
 
     <Button
+        android:id="@+id/stage2EndGame"
         android:layout_width="match_parent"
         android:layout_height="40sp"
         android:layout_alignParentLeft="true"

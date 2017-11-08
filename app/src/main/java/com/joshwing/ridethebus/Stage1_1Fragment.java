@@ -68,6 +68,8 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         suit.setVisibility(View.GONE);
 
         //Set listeners
+        Button endGame = (Button) v.findViewById(R.id.stage1EndGame);
+        endGame.setOnClickListener(this);
         Button red = (Button) v.findViewById(R.id.Red);
         red.setOnClickListener(this);
         Button black = (Button) v.findViewById(R.id.Black);
@@ -115,6 +117,12 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
     //Missing: check to see if their answer was correct
     public void onClick(View v) {
         switch (v.getId()) {
+
+            case  R.id.stage1EndGame:{
+                getActivity().finish();
+                break;
+            }
+
             case  R.id.Red: {
                 final int card = dataPasser.doNextCard(0);
                 redOrBlack.setVisibility(View.GONE);
