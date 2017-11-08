@@ -96,9 +96,7 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d("Here 1", "hi");
         dataPasser = (stageOneListener) context;
-        Log.d("Here 2", "hi");
     }
 
     private void drawCard(ImageView cardView, int image) {
