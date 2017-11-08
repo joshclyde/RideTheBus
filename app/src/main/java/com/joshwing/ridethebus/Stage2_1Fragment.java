@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import classes.CardFunctions;
@@ -16,7 +17,7 @@ import classes.CardFunctions;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Stage2_1Fragment extends Fragment implements View.OnTouchListener {
+public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, View.OnClickListener {
 
     stageTwoListener dataPasser;
     ImageView currentCard;
@@ -44,6 +45,8 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener {
         } else {
             totalNumCards = 25;
         }
+        Button endGame = v.findViewById(R.id.stage2EndGame);
+        endGame.setOnClickListener(this);
         v.setOnTouchListener(this);
         //Makes Java Objects from XML Card elements
         pyramidOfCards = indexAllCards(v, maxNumRows);
@@ -58,6 +61,14 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener {
         super.onAttach(context);
         dataPasser = (stageTwoListener) context;
     }
+  
+    @Override
+    public void onClick(View v){
+        if(v.getId() == R.id.stage2EndGame){
+            getActivity().finish();
+        }
+    }
+
 
     @Override
     public boolean onTouch(View v, MotionEvent motionEvent){

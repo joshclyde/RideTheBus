@@ -9,14 +9,17 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:gravity="center" >
-        <Button
+        <ImageView
+            android:id="@+id/playerPicture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Load Player" />
+            android:src="@drawable/blank"
+            />
         <Button
+            android:id="@+id/takePicture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Picture"/>
+            android:text="Take Picture"/>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -30,8 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/newPlayerNameTextView"
-                android:inputType="text"
-                android:hint="Josh Clyde"/>
+                android:inputType="text"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -46,8 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/newPlayerMaxDrinksTextView"
-                android:inputType="number"
-                android:hint="6"/>
+                android:inputType="number"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
