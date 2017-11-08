@@ -1,6 +1,7 @@
 package com.joshwing.ridethebus;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,12 +11,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import classes.CardFunctions;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, View.OnClickListener {
 
+    stageTwoListener dataPasser;
     ImageView currentCard;
     ImageView[] pyramidOfCards;
     int totalNumCards;
@@ -53,6 +57,12 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        dataPasser = (stageTwoListener) context;
+    }
+  
+    @Override
     public void onClick(View v){
         if(v.getId() == R.id.stage2EndGame){
             getActivity().finish();
@@ -78,10 +88,13 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
         }
 
         if(pressed){
-            currentCard.setImageResource(R.drawable.clubs_2);
-            if (cardIndex < totalNumCards){
-                currentCard = pyramidOfCards[cardIndex];
+            int cardVal = dataPasser.flipStage2();
+            currentCard.setImageResource(CardFunctions.getImage(cardVal));
+            if (cardIndex < totalNumCards - 1){
                 cardIndex++;
+                currentCard = pyramidOfCards[cardIndex];
+            } else {
+                dataPasser.finishGame();
             }
             return true;
         }
@@ -130,6 +143,11 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
         return pyramidOfCards;
     }
 
+    //Interface method for next player; implemented in activity
+    public interface stageTwoListener{
+        public int flipStage2();
+        public void finishGame();
+    }
 
 
 }
