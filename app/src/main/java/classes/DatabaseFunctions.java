@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import database.RideTheBusContract;
@@ -108,7 +109,86 @@ public class DatabaseFunctions {
         cards.close();
     }
 
-    public static void createDiamond(RideTheBusDbHelper dbHelper, long gameId) {}
+    public static int flipStage2(RideTheBusDbHelper dbHelper, long gameId) {
+        Cursor game = getGameWhereId(dbHelper, gameId);
+        game.moveToNext();
+        // long playerId = game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_PLAYER_ID));
+        long cardId = game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_CARD_ID));
+        game.close();
+//        long playerId = getPlayerStateIdWhereTurn(dbHelper, gameId, 0);
+//        setGamePlayerId(dbHelper, gameId, playerId);
+        // nextPlayerStage2(dbHelper, gameId);
+        return getCardValue(dbHelper, cardId);
+    }
+
+    public static long nextPlayerStage2(RideTheBusDbHelper dbHelper, long gameId) {
+        Cursor game = getGameWhereId(dbHelper, gameId);
+        game.moveToNext();
+        long playerId = game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_PLAYER_ID));
+        long cardId = game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_CARD_ID));
+        game.close();
+        LinkedList<Long> players = getPlayersWithCardValue(dbHelper, gameId, getCardValue(dbHelper, cardId));
+
+        if (players.size() == 0) {
+            nextDiamondCard(dbHelper, gameId);
+            return -1;
+        } else if (playerId == -1) {
+            setGamePlayerId(dbHelper, gameId, players.get(0));
+            return players.get(0);
+        } else {
+            int index = players.indexOf(playerId);
+            if (index == players.size() - 1) {
+                setGamePlayerId(dbHelper, gameId, -1);
+                nextDiamondCard(dbHelper, gameId);
+                return -1;
+            } else {
+                setGamePlayerId(dbHelper, gameId, players.get(index + 1));
+                return players.get(index + 1);
+            }
+        }
+    }
+
+    public static boolean nextDiamondCard(RideTheBusDbHelper dbHelper, long gameId) {
+        Cursor game = getGameWhereId(dbHelper, gameId);
+        game.moveToNext();
+        long cardId = game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_CARD_ID));
+        game.close();
+        Cursor diamondCards = getDiamondCards(dbHelper, gameId);
+        diamondCards.moveToNext();
+        while (!diamondCards.isAfterLast() && cardId != diamondCards.getLong(diamondCards.getColumnIndexOrThrow(CardTable._ID))) {
+            diamondCards.moveToNext();
+        }
+        if (diamondCards.isAfterLast() || diamondCards.isLast()) {
+            return false;
+        } else {
+            diamondCards.moveToNext();
+            long nextCardId = diamondCards.getLong(diamondCards.getColumnIndexOrThrow(CardTable._ID));
+            setGameCardId(dbHelper, gameId, nextCardId);
+            return true;
+        }
+
+    }
+
+    public static long stage2CurrentPlayer(RideTheBusDbHelper dbHelper, long gameId) {
+        Cursor game = getGameWhereId(dbHelper, gameId);
+        game.moveToNext();
+        return game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_PLAYER_ID));
+    }
+
+//    public static long stage2OtherPlayers(RideTheBusDbHelper dbHelper, long gameId, long playerId) {
+//
+//    }
+
+    public static void createDiamond(RideTheBusDbHelper dbHelper, long gameId) {
+        for (int i = 0; i < 16; i++) {
+            long cardId = getEmptyCardId(dbHelper, gameId);
+            setCardDiamondOrder(dbHelper, cardId, i);
+        }
+        Cursor diamondCards = getDiamondCards(dbHelper, gameId);
+        diamondCards.moveToNext();
+        setGamePlayerId(dbHelper, gameId, -1);
+        setGameCardId(dbHelper, gameId, diamondCards.getLong(diamondCards.getColumnIndexOrThrow(CardTable._ID)));
+    }
 
     public static int getNumberOfPlayers(RideTheBusDbHelper dbHelper, long gameId) {
         return getPlayerState(dbHelper, gameId).getCount();
@@ -191,6 +271,27 @@ public class DatabaseFunctions {
         return cursor;
     }
 
+    public static LinkedList<Long> getPlayersWithCardValue(RideTheBusDbHelper dbHelper, long gameId, int cardVal) {
+        Cursor players = getPlayerState(dbHelper, gameId);
+        Cursor cards = getCardWithValue(dbHelper, gameId, cardVal);
+        LinkedList<Long> playersWithCard = new LinkedList<Long>();
+        LinkedList<Long> cardPlayerIds = new LinkedList<Long>();
+        while (cards.moveToNext()) {
+            long cardPlayerId = cards.getLong(cards.getColumnIndexOrThrow(CardTable.COLUMN_PLAYER_ID));
+            if (cardPlayerId > 0 && !cardPlayerIds.contains(cardPlayerId)) {
+                cardPlayerIds.add(cardPlayerId);
+            }
+        }
+
+        while (players.moveToNext()) {
+            long playerId = players.getLong(cards.getColumnIndexOrThrow(PlayerStateTable._ID));
+            if (cardPlayerIds.contains(playerId)) {
+                playersWithCard.add(playerId);
+            }
+        }
+        return playersWithCard;
+    }
+
     public static int getCardValue(RideTheBusDbHelper dbHelper, long cardId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         // SELECT
@@ -217,6 +318,39 @@ public class DatabaseFunctions {
         );
         cursor.moveToNext();
         return cursor.getInt(cursor.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
+    }
+
+    public static Cursor getCardWithValue(RideTheBusDbHelper dbHelper, long gameId, int value) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        // SELECT
+        String[] projection = {
+                CardTable._ID,
+                CardTable.COLUMN_VALUE,
+                CardTable.COLUMN_GAME_ID,
+                CardTable.COLUMN_DIAMOND_ORDER,
+                CardTable.COLUMN_PLAYER_ID,
+                CardTable.COLUMN_PLAYER_ORDER
+        };
+        // FROM
+        String tableName = CardTable.TABLE_NAME;
+        // WHERE
+        String selection = CardTable.COLUMN_GAME_ID + " = ? AND " + CardTable.COLUMN_VALUE + " = ?";
+        String[] selectionArgs = { Long.toString(gameId), Integer.toString(value) };
+        // SORT
+        String sortOrder =
+                CardTable._ID+ " ASC";
+        // QUERY
+        Cursor cursor = db.query(
+                tableName,                                // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort turn
+        );
+
+        return cursor;
     }
 
     public static Long getEmptyCardId(RideTheBusDbHelper dbHelper, long gameId) {
@@ -258,6 +392,75 @@ public class DatabaseFunctions {
         }
 
         return cursor.getLong(cursor.getColumnIndexOrThrow(CardTable._ID));
+    }
+
+    public static boolean isDiamond(RideTheBusDbHelper dbHelper, long gameId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        // SELECT
+        String[] projection = {
+                CardTable._ID,
+                CardTable.COLUMN_VALUE,
+                CardTable.COLUMN_GAME_ID,
+                CardTable.COLUMN_DIAMOND_ORDER,
+                CardTable.COLUMN_PLAYER_ID,
+                CardTable.COLUMN_PLAYER_ORDER
+        };
+        // FROM
+        String tableName = CardTable.TABLE_NAME;
+        // WHERE
+        String selection = CardTable.COLUMN_GAME_ID + " = ? AND " + CardTable.COLUMN_DIAMOND_ORDER + " = ?";
+        String[] selectionArgs = { Long.toString(gameId), Long.toString(0) };
+        // SORT
+        String sortOrder =
+                CardTable.COLUMN_VALUE + " DESC";
+        // QUERY
+        Cursor cursor = db.query(
+                tableName,                                // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort turn
+        );
+
+        boolean ret = cursor.getCount() > 0;
+        cursor.close();
+
+        return ret;
+    }
+
+    public static Cursor getDiamondCards(RideTheBusDbHelper dbHelper, long gameId) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        // SELECT
+        String[] projection = {
+                CardTable._ID,
+                CardTable.COLUMN_VALUE,
+                CardTable.COLUMN_GAME_ID,
+                CardTable.COLUMN_DIAMOND_ORDER,
+                CardTable.COLUMN_PLAYER_ID,
+                CardTable.COLUMN_PLAYER_ORDER
+        };
+        // FROM
+        String tableName = CardTable.TABLE_NAME;
+        // WHERE
+        String selection = CardTable.COLUMN_GAME_ID + " = ? AND " + CardTable.COLUMN_DIAMOND_ORDER + " > ?";
+        String[] selectionArgs = { Long.toString(gameId), Integer.toString(-1) };
+        // SORT
+        String sortOrder =
+                CardTable.COLUMN_DIAMOND_ORDER + " ASC";
+        // QUERY
+        Cursor cursor = db.query(
+                tableName,                                // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort turn
+        );
+
+        return cursor;
     }
 
     public static Cursor getPlayerState(RideTheBusDbHelper dbHelper, long gameId) {
@@ -388,6 +591,24 @@ public class DatabaseFunctions {
         ContentValues values = new ContentValues();
         values.put(CardTable.COLUMN_PLAYER_ID, playerId);
         values.put(CardTable.COLUMN_PLAYER_ORDER, playerOrder);
+
+        // Which row to update, based on the title
+        String selection = CardTable._ID + " LIKE ?";
+        String[] selectionArgs = { Long.toString(cardId) };
+
+        int count = db.update(
+                CardTable.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+    }
+
+    public static void setCardDiamondOrder(RideTheBusDbHelper dbHelper, long cardId, int diamondOrder) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // New value for one column
+        ContentValues values = new ContentValues();
+        values.put(CardTable.COLUMN_DIAMOND_ORDER, diamondOrder);
 
         // Which row to update, based on the title
         String selection = CardTable._ID + " LIKE ?";
