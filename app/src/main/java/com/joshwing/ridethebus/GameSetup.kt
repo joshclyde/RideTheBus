@@ -2,6 +2,7 @@ package com.joshwing.ridethebus
 
 import android.content.ContentValues
 import android.content.Intent
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentTransaction
 import android.util.Log
 import android.widget.FrameLayout
+import classes.DatabaseFunctions
 import classes.PlayerDetails
 import database.RideTheBusDbHelper
 
@@ -30,6 +32,8 @@ class GameSetup : FragmentActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_setup)
+
+
 
         if (findViewById<FrameLayout>(R.id.gameSetupFragmentContainer) != null) {
             if (savedInstanceState != null) {
@@ -117,6 +121,12 @@ class GameSetup : FragmentActivity(),
                 cardValues.put(CardTable.COLUMN_PLAYER_ORDER, -1)
                 db.insert(CardTable.TABLE_NAME, null, cardValues)
             }
+
+
+            val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+            val editor = sharedPref.edit()
+            editor.putLong("gameId", newGameId)
+            editor.commit()
 
             val intent = Intent(this, GamePlayActivity::class.java)
             intent.putExtra("gameId", newGameId)

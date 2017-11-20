@@ -20,6 +20,8 @@ public class DatabaseFunctions {
 
     private DatabaseFunctions() {}
 
+    public static final String sharedPrefId = "myPrefs";
+
     // returns whether player must take drink or not
     public static boolean isTakeDrink(RideTheBusDbHelper dbHelper, long gameId, int choice) {
         Cursor game = getGameWhereId(dbHelper, gameId);

@@ -1,24 +1,11 @@
 package com.joshwing.ridethebus;
 
-import android.app.FragmentManager;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 
-import classes.Card;
 import classes.DatabaseFunctions;
-import classes.Game;
-import classes.GameLogic;
-import classes.PlayerState;
-import database.RideTheBusContract.GameTable;
-import database.RideTheBusContract.PlayerStateTable;
-import database.RideTheBusContract.PlayerDetailsTable;
-import database.RideTheBusContract.CardTable;
 import database.RideTheBusDbHelper;
 
 public class GamePlayActivity extends FragmentActivity

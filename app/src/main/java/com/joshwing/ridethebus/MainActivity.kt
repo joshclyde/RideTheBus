@@ -6,7 +6,9 @@ import android.util.Log
 import android.view.View
 import android.support.v4.content.ContextCompat.startActivity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.widget.Button
+import classes.DatabaseFunctions
 
 
 private val TAG = "MainActivity"
@@ -18,6 +20,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_main)
         val startGameButton = findViewById<Button>(R.id.startGameButton)
         startGameButton.setOnClickListener(this)
+
+        val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+        val gameId = sharedPref.getLong("gameId", -1L)
+        if (gameId != -1L) {
+            val loadGameButton = findViewById<Button>(R.id.loadGameButton)
+            loadGameButton.visibility = View.VISIBLE
+        } else {
+            val loadGameButton = findViewById<Button>(R.id.loadGameButton)
+            loadGameButton.visibility = View.GONE
+        }
 
         Log.v(TAG, "logging onCreate...")
     }
