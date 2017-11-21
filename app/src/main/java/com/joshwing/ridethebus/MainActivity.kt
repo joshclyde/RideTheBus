@@ -7,6 +7,7 @@ import android.view.View
 import android.support.v4.content.ContextCompat.startActivity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.PersistableBundle
 import android.widget.Button
 import classes.DatabaseFunctions
 
@@ -15,6 +16,7 @@ private val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
 
+    val GAME_ID_STATE = "GAME_ID_STATE";
     var gameId = -1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +37,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         Log.v(TAG, "logging onCreate...")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putLong(GAME_ID_STATE, gameId);
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        gameId = savedInstanceState!!.getLong(GAME_ID_STATE);
     }
 
     override fun onClick(v: View) {

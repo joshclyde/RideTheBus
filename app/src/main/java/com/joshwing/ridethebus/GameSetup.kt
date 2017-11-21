@@ -25,8 +25,18 @@ class GameSetup : FragmentActivity(),
         NumberOfPlayersFragment.NumberOfPlayersDataPass,
         NewPlayerFragment.NewPlayerDataPass {
 
+    var NEW_PLAYER_INDEX_STATE = "NEW_PLAYER_INDEX_STATE"
     var newPlayerIndex: Int = 0
+    var NEW_PLAYER_INDEX_COUNT = "NEW_PLAYER_INDEX_COUNT"
     var newPlayerCount: Int = 0
+//    name
+//    playerDetails[newPlayerIndex].drink = drink
+//    playerDetails[newPlayerIndex].picId = picId
+//    playerDetails[newPlayerIndex].maxDrinks = maxDrinks
+    var PD_NAME = "PD_NAME_"
+    var PD_DRINK = "PD_DRINK_"
+    var PD_PIC_ID = "PD_PIC_ID_"
+    var PD_MAX_DRINKS = "PD_MAX_DRINKS_"
     lateinit var playerDetails: Array<PlayerDetails>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +58,35 @@ class GameSetup : FragmentActivity(),
                     .add(R.id.gameSetupFragmentContainer, fragment).commit();
             //fragmentTransaction.add(R.id.gameSetupFragmentContainer, fragment)
             //fragmentTransaction.commit()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putInt(NEW_PLAYER_INDEX_STATE, newPlayerIndex)
+        outState?.putInt(NEW_PLAYER_INDEX_COUNT, newPlayerCount)
+        var i = 0
+        while (i < newPlayerIndex) {
+            outState?.putString(PD_NAME + i, playerDetails[i].name)
+            outState?.putString(PD_DRINK + i, playerDetails[i].drink)
+            outState?.putInt(PD_PIC_ID + i, playerDetails[i].picId)
+            outState?.putInt(PD_MAX_DRINKS + i, playerDetails[i].maxDrinks)
+            i++
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        newPlayerIndex = savedInstanceState!!.getInt(NEW_PLAYER_INDEX_STATE)
+        newPlayerCount = savedInstanceState!!.getInt(NEW_PLAYER_INDEX_COUNT)
+        playerDetails = Array<PlayerDetails>(newPlayerCount, {i -> PlayerDetails(i, "", "", 0, 0)})
+        var i = 0
+        while (i < newPlayerIndex) {
+            playerDetails[i].name = savedInstanceState!!.getString(PD_NAME + i)
+            playerDetails[i].drink = savedInstanceState!!.getString(PD_DRINK + i)
+            playerDetails[i].picId = savedInstanceState!!.getInt(PD_PIC_ID + i)
+            playerDetails[i].maxDrinks = savedInstanceState!!.getInt(PD_MAX_DRINKS + i)
+            i++
         }
     }
 
