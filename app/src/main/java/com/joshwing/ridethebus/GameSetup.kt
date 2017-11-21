@@ -124,7 +124,10 @@ class GameSetup : FragmentActivity(),
 
 
             val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+
             val editor = sharedPref.edit()
+            editor.putInt("numOfCardsFlipped", 0)
+            editor.putBoolean("isStage1", true)
             editor.putLong("gameId", newGameId)
             editor.commit()
 

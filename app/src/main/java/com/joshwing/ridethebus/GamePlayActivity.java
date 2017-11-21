@@ -17,6 +17,9 @@ public class GamePlayActivity extends FragmentActivity
     int numOfPlayers = samplePlayers.length;
     long gameId;
     int index;
+    SharedPreferences sharedPref;
+    static String isStage1 = "isStage1";
+    static String numCardsFlipped = "numCardsFlipped";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +31,8 @@ public class GamePlayActivity extends FragmentActivity
         gameId = bundle.getLong("gameId");
         // logic = this.loadDatabase(gameId);
 
+        sharedPref = getApplicationContext().getSharedPreferences(DatabaseFunctions.sharedPrefId, 0);
+        boolean isStage1 = sharedPref.getBoolean(this.isStage1, true);
 
         if (findViewById(R.id.gamePlayFragmentContainer) != null) {
 
@@ -38,18 +43,32 @@ public class GamePlayActivity extends FragmentActivity
 //            if (logic.isStage1()) {
 //            }
 
-            Stage1_1Fragment stage1 = new Stage1_1Fragment();
-            Bundle args = new Bundle();
+            if (isStage1) {
+                Stage1_1Fragment stage1 = new Stage1_1Fragment();
+                Bundle args = new Bundle();
 //            args.putString("playerName", samplePlayers[0]);
-            RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
-            DatabaseFunctions.nextCard(dbHelper, gameId);
-            args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
-            args.putInt("index", 0);
+                RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
+                DatabaseFunctions.nextCard(dbHelper, gameId);
+                args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
+                args.putInt("index", 0);
 
-            stage1.setArguments(args);
-            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.add(R.id.gamePlayFragmentContainer, stage1, samplePlayers[0]);
-            ft.commit();
+                stage1.setArguments(args);
+                android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(R.id.gamePlayFragmentContainer, stage1, samplePlayers[0]);
+                ft.commit();
+            } else {
+
+                Stage2_1Fragment stage2 = new Stage2_1Fragment();
+                Bundle args = new Bundle();
+                //Switch between 4 or 5
+                args.putInt("maxNumRows", 4);
+                int numOfCardsFlipped = sharedPref.getInt(this.numCardsFlipped, 0);
+                args.putInt(this.numCardsFlipped, numOfCardsFlipped);
+                stage2.setArguments(args);
+                android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.gamePlayFragmentContainer, stage2);
+                ft.commit();
+            }
 
         }
 
@@ -72,6 +91,10 @@ public class GamePlayActivity extends FragmentActivity
             ft.replace(R.id.gamePlayFragmentContainer, stage1);
             ft.commit();
         } else{
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(this.isStage1, false);
+            editor.commit();
+
             Stage2_1Fragment stage2 = new Stage2_1Fragment();
             Bundle args = new Bundle();
             //Switch between 4 or 5
@@ -103,12 +126,31 @@ public class GamePlayActivity extends FragmentActivity
         int cardVal = DatabaseFunctions.flipStage2(dbHelper, gameId);
         DatabaseFunctions.nextDiamondCard(dbHelper, gameId);
 
+//        val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+//        val editor = sharedPref.edit()
+//
+//        editor.putLong("gameId", newGameId)
+//        editor.commit()
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(this.numCardsFlipped, 1 + sharedPref.getInt(this.numCardsFlipped, 0));
+        editor.commit();
+
         return cardVal;
+    }
+
+    @Override
+    public int getCardAtPosition(int pos) {
+        return DatabaseFunctions.getCardAtDiamondPos(new RideTheBusDbHelper(this), gameId, pos);
     }
 
     @Override
     public void finishGame() {
         DatabaseFunctions.deleteAllTables(new RideTheBusDbHelper(this));
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putLong("gameId", -1L);
+        editor.putInt(this.numCardsFlipped, 0);
+        editor.putBoolean(this.isStage1, true);
+        editor.commit();
         this.finish();
     }
 

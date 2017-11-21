@@ -473,6 +473,16 @@ public class DatabaseFunctions {
         return cursor;
     }
 
+    public static int getCardAtDiamondPos(RideTheBusDbHelper dbHelper, long gameId, int pos) {
+        Cursor diamondCards = getDiamondCards(dbHelper, gameId);
+        diamondCards.moveToNext();
+        for(int i = 0; i < pos; i++) {
+            diamondCards.moveToNext();
+        }
+        long cardId = diamondCards.getLong(diamondCards.getColumnIndexOrThrow(CardTable._ID));
+        return getCardValue(dbHelper, cardId);
+    }
+
     public static Cursor getPlayerState(RideTheBusDbHelper dbHelper, long gameId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         // SELECT
