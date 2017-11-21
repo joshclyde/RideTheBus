@@ -6,12 +6,18 @@ import android.util.Log
 import android.view.View
 import android.support.v4.content.ContextCompat.startActivity
 import android.content.Intent
+import android.content.SharedPreferences
+import android.os.PersistableBundle
 import android.widget.Button
+import classes.DatabaseFunctions
 
 
 private val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
+
+    val GAME_ID_STATE = "GAME_ID_STATE";
+    var gameId = -1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +25,28 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val startGameButton = findViewById<Button>(R.id.startGameButton)
         startGameButton.setOnClickListener(this)
 
+        val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+        gameId = sharedPref.getLong("gameId", -1L)
+        if (gameId != -1L) {
+            val loadGameButton = findViewById<Button>(R.id.loadGameButton)
+            loadGameButton.setOnClickListener(this)
+            loadGameButton.visibility = View.VISIBLE
+        } else {
+            val loadGameButton = findViewById<Button>(R.id.loadGameButton)
+            loadGameButton.visibility = View.GONE
+        }
+
         Log.v(TAG, "logging onCreate...")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putLong(GAME_ID_STATE, gameId);
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        gameId = savedInstanceState!!.getLong(GAME_ID_STATE);
     }
 
     override fun onClick(v: View) {
@@ -27,6 +54,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.startGameButton -> {
                 val intent = Intent(this, GameSetup::class.java)
                 startActivity(intent)
+            }
+            R.id.loadGameButton -> {
+                val intent = Intent(this, GamePlayActivity::class.java)
+                intent.putExtra("gameId", gameId)
+                startActivity(intent);
             }
         }
     }
@@ -44,6 +76,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onResume() {
         super.onResume()
         Log.v(TAG, "logging onResume...")
+
+
+        val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+        gameId = sharedPref.getLong("gameId", -1L)
+        if (gameId != -1L) {
+            val loadGameButton = findViewById<Button>(R.id.loadGameButton)
+            loadGameButton.setOnClickListener(this)
+            loadGameButton.visibility = View.VISIBLE
+        } else {
+            val loadGameButton = findViewById<Button>(R.id.loadGameButton)
+            loadGameButton.visibility = View.GONE
+        }
     }
 
     override fun onPause() {

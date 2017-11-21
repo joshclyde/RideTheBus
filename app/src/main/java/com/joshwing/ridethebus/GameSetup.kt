@@ -2,6 +2,7 @@ package com.joshwing.ridethebus
 
 import android.content.ContentValues
 import android.content.Intent
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentTransaction
 import android.util.Log
 import android.widget.FrameLayout
+import classes.DatabaseFunctions
 import classes.PlayerDetails
 import database.RideTheBusDbHelper
 
@@ -23,13 +25,25 @@ class GameSetup : FragmentActivity(),
         NumberOfPlayersFragment.NumberOfPlayersDataPass,
         NewPlayerFragment.NewPlayerDataPass {
 
+    var NEW_PLAYER_INDEX_STATE = "NEW_PLAYER_INDEX_STATE"
     var newPlayerIndex: Int = 0
+    var NEW_PLAYER_INDEX_COUNT = "NEW_PLAYER_INDEX_COUNT"
     var newPlayerCount: Int = 0
+//    name
+//    playerDetails[newPlayerIndex].drink = drink
+//    playerDetails[newPlayerIndex].picId = picId
+//    playerDetails[newPlayerIndex].maxDrinks = maxDrinks
+    var PD_NAME = "PD_NAME_"
+    var PD_DRINK = "PD_DRINK_"
+    var PD_PIC_ID = "PD_PIC_ID_"
+    var PD_MAX_DRINKS = "PD_MAX_DRINKS_"
     lateinit var playerDetails: Array<PlayerDetails>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_setup)
+
+
 
         if (findViewById<FrameLayout>(R.id.gameSetupFragmentContainer) != null) {
             if (savedInstanceState != null) {
@@ -44,6 +58,35 @@ class GameSetup : FragmentActivity(),
                     .add(R.id.gameSetupFragmentContainer, fragment).commit();
             //fragmentTransaction.add(R.id.gameSetupFragmentContainer, fragment)
             //fragmentTransaction.commit()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putInt(NEW_PLAYER_INDEX_STATE, newPlayerIndex)
+        outState?.putInt(NEW_PLAYER_INDEX_COUNT, newPlayerCount)
+        var i = 0
+        while (i < newPlayerIndex) {
+            outState?.putString(PD_NAME + i, playerDetails[i].name)
+            outState?.putString(PD_DRINK + i, playerDetails[i].drink)
+            outState?.putInt(PD_PIC_ID + i, playerDetails[i].picId)
+            outState?.putInt(PD_MAX_DRINKS + i, playerDetails[i].maxDrinks)
+            i++
+        }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        newPlayerIndex = savedInstanceState!!.getInt(NEW_PLAYER_INDEX_STATE)
+        newPlayerCount = savedInstanceState!!.getInt(NEW_PLAYER_INDEX_COUNT)
+        playerDetails = Array<PlayerDetails>(newPlayerCount, {i -> PlayerDetails(i, "", "", 0, 0)})
+        var i = 0
+        while (i < newPlayerIndex) {
+            playerDetails[i].name = savedInstanceState!!.getString(PD_NAME + i)
+            playerDetails[i].drink = savedInstanceState!!.getString(PD_DRINK + i)
+            playerDetails[i].picId = savedInstanceState!!.getInt(PD_PIC_ID + i)
+            playerDetails[i].maxDrinks = savedInstanceState!!.getInt(PD_MAX_DRINKS + i)
+            i++
         }
     }
 
@@ -117,6 +160,15 @@ class GameSetup : FragmentActivity(),
                 cardValues.put(CardTable.COLUMN_PLAYER_ORDER, -1)
                 db.insert(CardTable.TABLE_NAME, null, cardValues)
             }
+
+
+            val sharedPref = applicationContext.getSharedPreferences(DatabaseFunctions.sharedPrefId, 0)
+
+            val editor = sharedPref.edit()
+            editor.putInt("numOfCardsFlipped", 0)
+            editor.putBoolean("isStage1", true)
+            editor.putLong("gameId", newGameId)
+            editor.commit()
 
             val intent = Intent(this, GamePlayActivity::class.java)
             intent.putExtra("gameId", newGameId)

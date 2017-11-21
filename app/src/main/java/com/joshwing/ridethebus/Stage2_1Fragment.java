@@ -24,6 +24,7 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
     ImageView[] pyramidOfCards;
     int totalNumCards;
     int cardIndex;
+    int numOfCardsFlipped;
 
     public Stage2_1Fragment() {
         // Required empty public constructor
@@ -37,6 +38,7 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
 
         View v =  inflater.inflate(R.layout.fragment_stage2_1, container, false);
         int maxNumRows = this.getArguments().getInt("maxNumRows");
+        numOfCardsFlipped = this.getArguments().getInt(GamePlayActivity.numCardsFlipped);
 
         if(maxNumRows != 5){
             v.findViewById(R.id.topDownRow5).setVisibility(View.GONE);
@@ -52,6 +54,14 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
         pyramidOfCards = indexAllCards(v, maxNumRows);
         currentCard = v.findViewById(R.id.r1c1);
         cardIndex = 0;
+
+
+        for (int i = 0; i < numOfCardsFlipped; i++) {
+            int cardVal = dataPasser.getCardAtPosition(i);
+            currentCard.setImageResource(CardFunctions.getImage(cardVal));
+            cardIndex++;
+            currentCard = pyramidOfCards[cardIndex];
+        }
 
         return v;
     }
@@ -146,6 +156,7 @@ public class Stage2_1Fragment extends Fragment implements View.OnTouchListener, 
     //Interface method for next player; implemented in activity
     public interface stageTwoListener{
         public int flipStage2();
+        public int getCardAtPosition(int pos);
         public void finishGame();
     }
 

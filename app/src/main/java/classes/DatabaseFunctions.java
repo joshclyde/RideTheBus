@@ -20,6 +20,8 @@ public class DatabaseFunctions {
 
     private DatabaseFunctions() {}
 
+    public static final String sharedPrefId = "myPrefs";
+
     // returns whether player must take drink or not
     public static boolean isTakeDrink(RideTheBusDbHelper dbHelper, long gameId, int choice) {
         Cursor game = getGameWhereId(dbHelper, gameId);
@@ -237,6 +239,14 @@ public class DatabaseFunctions {
                 sortOrder                                 // The sort turn
         );
         return cursor;
+    }
+
+    public static void deleteAllTables(RideTheBusDbHelper dbHelper) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(GameTable.TABLE_NAME, null, null);
+        db.delete(CardTable.TABLE_NAME, null, null);
+        db.delete(PlayerStateTable.TABLE_NAME, null, null);
+        db.delete(PlayerDetailsTable.TABLE_NAME, null, null);
     }
 
     public static Cursor getCardWherePlayerId(RideTheBusDbHelper dbHelper, long gameId, long playerId) {
@@ -461,6 +471,16 @@ public class DatabaseFunctions {
         );
 
         return cursor;
+    }
+
+    public static int getCardAtDiamondPos(RideTheBusDbHelper dbHelper, long gameId, int pos) {
+        Cursor diamondCards = getDiamondCards(dbHelper, gameId);
+        diamondCards.moveToNext();
+        for(int i = 0; i < pos; i++) {
+            diamondCards.moveToNext();
+        }
+        long cardId = diamondCards.getLong(diamondCards.getColumnIndexOrThrow(CardTable._ID));
+        return getCardValue(dbHelper, cardId);
     }
 
     public static Cursor getPlayerState(RideTheBusDbHelper dbHelper, long gameId) {
