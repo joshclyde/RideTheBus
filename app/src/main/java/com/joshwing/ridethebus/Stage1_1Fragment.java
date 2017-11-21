@@ -282,21 +282,21 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
     }
 
     public void doToast(boolean shouldDrink) {
-        if (shouldDrink) {
-            Context context = this.getContext().getApplicationContext();
-            CharSequence text = "Drink!";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        } else {
-            Context context = this.getContext().getApplicationContext();
-            CharSequence text = "No drink.";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
+//        if (shouldDrink) {
+//            Context context = this.getContext().getApplicationContext();
+//            CharSequence text = "Drink!";
+//            int duration = Toast.LENGTH_SHORT;
+//
+//            Toast toast = Toast.makeText(context, text, duration);
+//            toast.show();
+//        } else {
+//            Context context = this.getContext().getApplicationContext();
+//            CharSequence text = "No drink.";
+//            int duration = Toast.LENGTH_SHORT;
+//
+//            Toast toast = Toast.makeText(context, text, duration);
+//            toast.show();
+//        }
     }
 
     //Interface method for next player; implemented in activity

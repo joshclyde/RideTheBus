@@ -241,6 +241,14 @@ public class DatabaseFunctions {
         return cursor;
     }
 
+    public static void deleteAllTables(RideTheBusDbHelper dbHelper) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(GameTable.TABLE_NAME, null, null);
+        db.delete(CardTable.TABLE_NAME, null, null);
+        db.delete(PlayerStateTable.TABLE_NAME, null, null);
+        db.delete(PlayerDetailsTable.TABLE_NAME, null, null);
+    }
+
     public static Cursor getCardWherePlayerId(RideTheBusDbHelper dbHelper, long gameId, long playerId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         // SELECT

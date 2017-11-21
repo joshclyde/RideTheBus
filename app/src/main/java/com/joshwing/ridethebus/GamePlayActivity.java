@@ -108,6 +108,7 @@ public class GamePlayActivity extends FragmentActivity
 
     @Override
     public void finishGame() {
+        DatabaseFunctions.deleteAllTables(new RideTheBusDbHelper(this));
         this.finish();
     }
 
