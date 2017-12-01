@@ -17,9 +17,12 @@ public class GamePlayActivity extends FragmentActivity
     int numOfPlayers = samplePlayers.length;
     long gameId;
     int index;
+    int stage1NumOfCards;
     SharedPreferences sharedPref;
     static String isStage1 = "isStage1";
     static String numCardsFlipped = "numCardsFlipped";
+    static String indexString = "indexString";
+    static String stage1NumOfCardsString = "stage1NumOfCardsString";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,8 @@ public class GamePlayActivity extends FragmentActivity
 
         sharedPref = getApplicationContext().getSharedPreferences(DatabaseFunctions.sharedPrefId, 0);
         boolean isStage1 = sharedPref.getBoolean(this.isStage1, true);
+        index = sharedPref.getInt(this.indexString, 0);
+        stage1NumOfCards = sharedPref.getInt(this.stage1NumOfCardsString, -1);
 
         if (findViewById(R.id.gamePlayFragmentContainer) != null) {
 
@@ -48,10 +53,16 @@ public class GamePlayActivity extends FragmentActivity
                 Bundle args = new Bundle();
 //            args.putString("playerName", samplePlayers[0]);
                 RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
-                DatabaseFunctions.nextCard(dbHelper, gameId);
+                if (stage1NumOfCards == -1) {
+                    DatabaseFunctions.nextCard(dbHelper, gameId);
+                    stage1NumOfCards = 0;
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt(this.stage1NumOfCardsString, 0);
+                    editor.commit();
+                }
                 args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
-                args.putInt("index", 0);
-
+                args.putInt(this.indexString, index);
+                args.putInt(this.stage1NumOfCardsString, stage1NumOfCards);
                 stage1.setArguments(args);
                 android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.add(R.id.gamePlayFragmentContainer, stage1, samplePlayers[0]);
@@ -80,12 +91,20 @@ public class GamePlayActivity extends FragmentActivity
     public void nextPlayer(){
         RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
         index++;
+
         if (index < DatabaseFunctions.getNumberOfPlayers(dbHelper, gameId)) {
+
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt(this.stage1NumOfCardsString, 0);
+            editor.putInt(this.indexString, index);
+            editor.commit();
+
             Stage1_1Fragment stage1 = new Stage1_1Fragment();
             Bundle args = new Bundle();
 //            args.putString("playerName", samplePlayers[index]);
             args.putString("playerName", DatabaseFunctions.getCurrentPlayerName(dbHelper, gameId));
             args.putInt("index", index);
+            args.putInt("numOfCards", 0);
             stage1.setArguments(args);
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.gamePlayFragmentContainer, stage1);
@@ -93,6 +112,8 @@ public class GamePlayActivity extends FragmentActivity
         } else{
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(this.isStage1, false);
+            editor.putInt(this.stage1NumOfCardsString, -1);
+            editor.putInt(this.indexString, -1);
             editor.commit();
 
             Stage2_1Fragment stage2 = new Stage2_1Fragment();
@@ -113,8 +134,18 @@ public class GamePlayActivity extends FragmentActivity
         takeDrink = DatabaseFunctions.isTakeDrink(dbHelper, gameId, choice);
         DatabaseFunctions.nextCard(dbHelper, gameId);
 
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(this.stage1NumOfCardsString, 1 + sharedPref.getInt(this.stage1NumOfCardsString, 0));
+        editor.commit();
+
         return card;
-    };
+    }
+    @Override
+    public int getPlayerCard(int playerIndex, int cardIndex) {
+        RideTheBusDbHelper dbHelper = new RideTheBusDbHelper(this);
+        int card = DatabaseFunctions.getCardForPlayer(dbHelper, gameId, playerIndex, cardIndex);
+        return card;
+    }
     @Override
     public boolean shouldTakeDrink() {
         return takeDrink;
