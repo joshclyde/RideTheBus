@@ -168,6 +168,8 @@ class GameSetup : FragmentActivity(),
             editor.putInt("numOfCardsFlipped", 0)
             editor.putBoolean("isStage1", true)
             editor.putLong("gameId", newGameId)
+            editor.putInt(GamePlayActivity.indexString, 0)
+            editor.putInt(GamePlayActivity.stage1NumOfCardsString, -1)
             editor.commit()
 
             val intent = Intent(this, GamePlayActivity::class.java)

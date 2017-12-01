@@ -42,6 +42,8 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_stage1_1, container, false);
         String playerName = this.getArguments().getString("playerName");
+        int playerIndex = this.getArguments().getInt(GamePlayActivity.indexString);
+        int cardIndex = this.getArguments().getInt(GamePlayActivity.stage1NumOfCardsString);
         TextView playerNameView = v.findViewById(R.id.playerName);
         playerNameView.setText(playerName);
 
@@ -90,6 +92,29 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         clubs.setOnClickListener(this);
         Button spades = (Button) v.findViewById(R.id.Spades);
         spades.setOnClickListener(this);
+
+        if (cardIndex >= 1) {
+            int tempCard = dataPasser.getPlayerCard(playerIndex, 0);
+            redOrBlack.setVisibility(View.GONE);
+            cardTransition(card1, card2, card0, tempCard);
+            higherOrLower.setVisibility(View.VISIBLE);
+        }
+
+        if (cardIndex >= 2) {
+            int tempCard = dataPasser.getPlayerCard(playerIndex, 1);
+            higherOrLower.setVisibility(View.GONE);
+            cardTransition(card2, card3, card0, tempCard);
+            betweenOutside.setVisibility(View.VISIBLE);
+        }
+
+        if (cardIndex >= 3) {
+            int tempCard = dataPasser.getPlayerCard(playerIndex, 2);
+            betweenOutside.setVisibility(View.GONE);
+            cardTransition(card3, card4, card0, tempCard);
+            suit.setVisibility(View.VISIBLE);
+        }
+
+
 
 
         return v;
@@ -304,6 +329,7 @@ public class Stage1_1Fragment extends Fragment implements View.OnClickListener {
         public void nextPlayer();
         public int doNextCard(int choice);
         public boolean shouldTakeDrink();
+        public int getPlayerCard(int playerIndex, int cardIndex);
     }
 
 }

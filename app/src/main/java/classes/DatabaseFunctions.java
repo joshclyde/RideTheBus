@@ -249,6 +249,18 @@ public class DatabaseFunctions {
         db.delete(PlayerDetailsTable.TABLE_NAME, null, null);
     }
 
+    public static int getCardForPlayer(RideTheBusDbHelper dbHelper, long gameId, int playerIndex, int cardIndex) {
+        Cursor game = getGameWhereId(dbHelper, gameId);
+        game.moveToNext();
+        long playerId = game.getLong(game.getColumnIndexOrThrow(GameTable.COLUMN_PLAYER_ID));
+        Cursor allCards = getCardWherePlayerId(dbHelper, gameId, playerId);
+        allCards.moveToNext();
+        for (int i = 0; i < cardIndex; i++) {
+            allCards.moveToNext();
+        }
+        return allCards.getInt(allCards.getColumnIndexOrThrow(CardTable.COLUMN_VALUE));
+    }
+
     public static Cursor getCardWherePlayerId(RideTheBusDbHelper dbHelper, long gameId, long playerId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         // SELECT
